@@ -26,7 +26,7 @@ app.get('/health', (req, res) => {
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack, next);
-  res.status(500).json({ message: '      Opps Something went wrong!' });
+  res.status(500).json({ message: 'Opps Something went wrong!' });
 });
 
 // 404 handler
