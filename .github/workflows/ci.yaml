@@ -9,33 +9,41 @@ on:
 jobs:
   build-and-lint:
     runs-on: ubuntu-latest
-  steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
 
-    - name: Setup Node
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Install backend dependencies
-      working-directory: server
-      run: npm ci
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: npm
 
-    - name: Lint backend
-      working-directory: server
-      run: npm run lint -- --max-warnings=0
+      # -------- Backend --------
+      - name: Install backend dependencies
+        working-directory: server
+        run: npm ci
 
-    - name: Install frontend dependencies
-      working-directory: client
-      run: npm ci
+      - name: Lint backend
+        working-directory: server
+        run: npm run lint -- --max-warnings=0
 
-    - name: Lint frontend
-      working-directory: client
-      run: npm run lint -- --max-warnings=0
+      # -------- Frontend --------
+      - name: Install frontend dependencies
+        working-directory: client
+        run: npm ci
 
-    - name: Build backend Docker image
-      run: docker build -t backend ./server
-    
-    - name: Build frontend Docker image
-      run: docker build -t frontend ./client
+      - name: Lint frontend
+        working-directory: client
+        run: npm run lint -- --max-warnings=0
+
+      # -------- Docker --------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image
+        run: docker build -t backend ./server
+
+      - name: Build frontend Docker image
+        run: docker build -t frontend ./client
